@@ -60,6 +60,16 @@
   justify-content: center;
   align-items: center;
 }
+.image-viewer{
+  margin:15px  auto 0 auto ;
+  width: max-content;
+  border: none solid;
+  border-radius: 20px;
+}
+.model-image{
+  width: fit-content;
+  
+}
 
 .close-btn:hover {
   background-color: #d32f2f;

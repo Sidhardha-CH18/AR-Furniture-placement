@@ -13,7 +13,17 @@ function Home() {
     { name: "coffeetable", image: "/images/coffeetable.png", glb: "/models/coffeetable.glb" },
     { name: "nesttable", image: "/images/nesttable.png", glb: "/models/nesttable.glb" },
     { name: "armchairv", image: "/images/armchairv.png", glb: "/models/armchairv.glb" },
-    { name: "fliptable", image: "/images/fliptable.png", glb: "/models/fILptable.glb" },
+    { name: "fliptable", image: "/images/fliptable.png", glb: "/models/filptable.glb" },
+    { name: "armchairk", image: "/images/armchairk.png", glb: "/models/armchairk.glb" },
+    { name: "armchairp", image: "/images/armchairp.png", glb: "/models/armchairp.glb" },
+    { name: "carpet", image: "/images/carpet.png", glb: "/models/carpet.glb" },
+    { name: "coffee set", image: "/images/coffeeset.png", glb: "/models/coffeeset.glb" },
+    { name: "dinning table", image: "/images/dintable.png", glb: "/models/dintable.glb" },
+    { name: "fcouch", image: "/images/fcouch.png", glb: "/models/fcouch.glb" },
+    { name: "lamp", image: "/images/lamp.png", glb: "/models/lamp.glb" },
+    { name: "rtable", image: "/images/rtable.png", glb: "/models/rtable.glb" },
+    { name: "side board", image: "/images/sideboard.png", glb: "/models/sideboard.glb" },
+    { name: "tv stand", image: "/images/tvstand.png", glb: "/models/tvstand.glb" }
   ]);
   const [selectedModel, setSelectedModel] = useState(null);
   const navigate = useNavigate();  // Initialize navigate hook
