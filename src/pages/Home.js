@@ -8,22 +8,22 @@ function Home() {
   
   const [isBottomScreenVisible, setBottomScreenVisible] = useState(false);
   const [models] = useState([
-    { name: "armchair", image: "/images/armchair.png", glb: "/models/armchair.glb" },
-    { name: "lounger", image: "/images/lounger.png", glb: "/models/lounger.glb" },
-    { name: "coffeetable", image: "/images/coffeetable.png", glb: "/models/coffeetable.glb" },
-    { name: "nesttable", image: "/images/nesttable.png", glb: "/models/nesttable.glb" },
-    { name: "armchairv", image: "/images/armchairv.png", glb: "/models/armchairv.glb" },
-    { name: "fliptable", image: "/images/fliptable.png", glb: "/models/filptable.glb" },
-    { name: "armchairk", image: "/images/armchairk.png", glb: "/models/armchairk.glb" },
-    { name: "armchairp", image: "/images/armchairp.png", glb: "/models/armchairp.glb" },
-    { name: "carpet", image: "/images/carpet.png", glb: "/models/carpet.glb" },
-    { name: "coffee set", image: "/images/coffeeset.png", glb: "/models/coffeeset.glb" },
-    { name: "dinning table", image: "/images/dintable.png", glb: "/models/dintable.glb" },
-    { name: "fcouch", image: "/images/fcouch.png", glb: "/models/fcouch.glb" },
-    { name: "lamp", image: "/images/lamp.png", glb: "/models/lamp.glb" },
-    { name: "rtable", image: "/images/rtable.png", glb: "/models/rtable.glb" },
-    { name: "side board", image: "/images/sideboard.png", glb: "/models/sideboard.glb" },
-    { name: "tv stand", image: "/images/tvstand.png", glb: "/models/tvstand.glb" }
+    { name: "armchair", image: "/images/armchair.png", glb: "/models/armchair.glb", target: 0.01},
+    { name: "lounger", image: "/images/lounger.png", glb: "/models/lounger.glb", target:0.01 },
+    { name: "coffeetable", image: "/images/coffeetable.png", glb: "/models/coffeetable.glb", target: 0.005 },
+    { name: "nesttable", image: "/images/nesttable.png", glb: "/models/nesttable.glb", target: 0.01 },
+    { name: "armchairv", image: "/images/armchairv.png", glb: "/models/armchairv.glb", target: 0.01 },
+    { name: "fliptable", image: "/images/fliptable.png", glb: "/models/filptable.glb", target: 0.01 },
+    { name: "armchairk", image: "/images/armchairk.png", glb: "/models/armchairk.glb", target:4 },
+    { name: "armchairp", image: "/images/armchairp.png", glb: "/models/armchairp.glb", target:1.8 },
+    { name: "carpet", image: "/images/carpet.png", glb: "/models/carpet.glb", target: 3 },
+    { name: "coffee set", image: "/images/coffeeset.png", glb: "/models/coffeeset.glb", target: 1.2},
+    { name: "dinning table", image: "/images/dintable.png", glb: "/models/dintable.glb", target: 3 },
+    { name: "fcouch", image: "/images/fcouch.png", glb: "/models/fcouch.glb", target:2.2 },
+    { name: "lamp", image: "/images/lamp.png", glb: "/models/lamp.glb", target: 5 },
+    { name: "rtable", image: "/images/rtable.png", glb: "/models/rtable.glb", target: 5 },
+    { name: "side board", image: "/images/sideboard.png", glb: "/models/sideboard.glb", target:3 },
+    { name: "tv stand", image: "/images/tvstand.png", glb: "/models/tvstand.glb", target: 3 }
   ]);
   const [selectedModel, setSelectedModel] = useState(null);
   const navigate = useNavigate();  // Initialize navigate hook

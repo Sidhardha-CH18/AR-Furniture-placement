@@ -10,7 +10,7 @@ function ARView() {
   const location = useLocation();  // Access the current location object
   const { ms } = location.state || {};
   const modelPath = ms.glb;
-  // const modelScaleFactor = 0.01;
+  const modelScaleFactor = ms.target;
 
   let reticle;
   let hitTestSource = null;
@@ -230,7 +230,14 @@ function ARView() {
       // c
 
       const maxDimension = Math.max(modelWidth, modelHeight, modelDepth);
-      const scaleFactor = 3 / (maxDimension);
+      let scaleFactor;
+      if(modelScaleFactor<1){
+        scaleFactor=modelScaleFactor;
+      }
+      else{
+        scaleFactor = modelScaleFactor/ (maxDimension);
+      }
+      
 
 
 
