@@ -1,4 +1,3 @@
-// import "./App.css";
 import * as THREE from "three";
 import { ARButton } from "three/examples/jsm/webxr/ARButton";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
@@ -7,7 +6,7 @@ import { XREstimatedLight } from "three/examples/jsm/webxr/XREstimatedLight";
 import { useLocation } from 'react-router-dom';
 
 function ARView() {
-  const location = useLocation();  // Access the current location object
+  const location = useLocation();
   const { ms } = location.state || {};
   const modelPath = ms.glb;
   const modelScaleFactor = ms.target;
@@ -18,21 +17,17 @@ function ARView() {
 
   let scene, camera, renderer;
   let model;
-  let models=[];
+  let models = [];
   let controller;
 
-  let selectedModel=null; //add-2
+  let selectedModel = null;
 
-  let modelPlaced = false; //add-3
-
-  //add-3
+  let modelPlaced = false;
 
   let light, directionalLight;
   let xrLight;
 
   let deleteButton;
-
-
 
   init();
   animate();
@@ -40,38 +35,26 @@ function ARView() {
   function init() {
     let myCanvas = document.getElementById("canvas");
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(
-      70,
-      myCanvas.innerWidth / myCanvas.innerHeight,
-      0.01,
-      20
-    );
+    camera = new THREE.PerspectiveCamera(70, myCanvas.innerWidth / myCanvas.innerHeight, 0.01, 20);
 
     light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
     light.position.set(0.5, 1, 0.25);
     scene.add(light);
 
-
-    //add 
     directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(3, 5, -3);
     directionalLight.castShadow = true;
-
-    //add0.1
     directionalLight.shadow.bias = -0.03;
     directionalLight.shadow.mapSize.width = 1024;
     directionalLight.shadow.mapSize.height = 1024;
-
-    directionalLight.intensity = 1.5
+    directionalLight.intensity = 1.5;
     directionalLight.shadow.opacity = 0.6;
 
     scene.add(directionalLight);
 
-
-    const ambientLight = new THREE.AmbientLight(0x404040, 0.5); 
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
     scene.add(ambientLight);
 
-    
     renderer = new THREE.WebGLRenderer({
       canvas: myCanvas,
       antialias: true,
@@ -80,22 +63,16 @@ function ARView() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(myCanvas.innerWidth, myCanvas.innerHeight);
     renderer.xr.enabled = true;
-
-    //add
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    //add-3
-    xrLight=new XREstimatedLight(renderer);
-
+    xrLight = new XREstimatedLight(renderer);
 
     xrLight.addEventListener("estimationstart", () => {
       scene.add(xrLight);
       scene.remove(light);
       if (xrLight.environment) {
         scene.environment = xrLight.environment;
-
-        //add-3
         adjustLightingBasedOnEstimation();
       }
     });
@@ -114,19 +91,15 @@ function ARView() {
     arButton.style.bottom = "20%";
     document.body.appendChild(arButton);
 
-    // Load the single model
     const loader = new GLTFLoader();
     loader.load(modelPath, function (glb) {
       model = glb.scene;
-
-      //add
       model.traverse((child) => {
         if (child.isMesh) {
-          child.castShadow = true; 
+          child.castShadow = true;
           child.receiveShadow = false;
         }
       });
-
     }, undefined, function (error) {
       console.error(`Error loading model ${modelPath}:`, error);
     });
@@ -144,8 +117,6 @@ function ARView() {
     reticle.visible = false;
     scene.add(reticle);
 
-    //add
-
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(100, 100),
       new THREE.ShadowMaterial({ opacity: 0.5 })
@@ -155,11 +126,9 @@ function ARView() {
     floor.receiveShadow = true;
     scene.add(floor);
 
-
     window.addEventListener('touchstart', (event) => onTouchStart(event));
     window.addEventListener('touchmove', (event) => onTouchMove(event));
     window.addEventListener('touchend', (event) => onTouchEnd(event));
-
 
     deleteButton = document.createElement('button');
     deleteButton.innerText = 'Delete Model';
@@ -170,185 +139,118 @@ function ARView() {
     deleteButton.style.transform = 'translateX(-50%)';
     deleteButton.style.zIndex = '10';
     deleteButton.style.display = 'none';
-
-    
     deleteButton.style.padding = '10px';
     deleteButton.style.border = '2px solid white';
     deleteButton.style.borderRadius = '10px';
     deleteButton.style.backgroundColor = 'transparent';
-    deleteButton.style.color = 'black';
+    deleteButton.style.color = 'white';
     deleteButton.style.fontWeight = 'bold';
     deleteButton.style.fontSize = '18px';
     deleteButton.addEventListener('click', deleteSelectedModel);
     document.body.appendChild(deleteButton);
   }
-  
-
 
   function deleteSelectedModel() {
     if (selectedModel) {
       scene.remove(selectedModel);
-      models = models.filter(model => model !== selectedModel); // Remove from models array
-      selectedModel = null; // Clear selected model
-      console.log('Model deleted');
+      models = models.filter(model => model !== selectedModel);
+      selectedModel = null;
       deleteButton.style.display = 'none';
-
     }
   }
 
-  //add-3
-
   function adjustLightingBasedOnEstimation() {
-    if(xrLight.environment){
-      const estimatedIntensity=xrLight.environment.intensity || 1.0;
+    if (xrLight.environment) {
+      const estimatedIntensity = xrLight.environment.intensity || 1.0;
       directionalLight.intensity = estimatedIntensity;
 
       const estimatedDirection = xrLight.environment.direction;
       directionalLight.position.set(estimatedDirection.x, estimatedDirection.y, estimatedDirection.z);
-      
-      const estimatedColorTemperature = xrLight.environment.colorTemperature || 6500; // Default: 6500K (white light)
-     directionalLight.color.setHSL(estimatedColorTemperature / 10000, 0.5, 0.5); // Adjust color temperature
+
+      const estimatedColorTemperature = xrLight.environment.colorTemperature || 6500;
+      directionalLight.color.setHSL(estimatedColorTemperature / 10000, 0.5, 0.5);
     }
   }
 
-
-  //add-2
-
-  function onSelectStart(event){
+  function onSelectStart(event) {
     const intersection = getIntersection(event.data.controller);
-    if (selectedModel) {// && selectedModel===intersection.object
-      // Deselect the current model if any
-      selectedModel.material.emissive.set(0x000000); // Reset highlight (e.g., remove color change)
+    if (selectedModel) {
+      selectedModel.material.emissive.set(0x000000);
       selectedModel = null;
-    }
-    else{
+    } else {
       if (intersection) {
         selectedModel = intersection.object;
         selectedModel.material.emissive.set(0xff0000);
         deleteButton.style.display = 'block';
-         // Highlight selected model
-        console.log('Selected model:', selectedModel);
-      } 
+      }
     }
   }
 
-  //add-2
   function getIntersection(controller) {
     const raycaster = new THREE.Raycaster();
     raycaster.ray.origin.set(controller.position.x, controller.position.y, controller.position.z);
-    raycaster.ray.direction.set(0, -1, 0); // Raycasting downward
+    raycaster.ray.direction.set(0, -1, 0);
 
     const intersects = raycaster.intersectObjects(models);
     return intersects.length > 0 ? intersects[0] : null;
   }
 
   function onSelect() {
-
-    if (reticle.visible && !modelPlaced ) {
+    if (reticle.visible && !modelPlaced) {
       const newModel = model.clone();
       newModel.visible = true;
 
-      // Set position and rotation
-      reticle.matrix.decompose(
-        newModel.position,
-        newModel.quaternion,
-        newModel.scale
-      );
+      reticle.matrix.decompose(newModel.position, newModel.quaternion, newModel.scale);
 
-      //add-to-know
       newModel.position.y -= 0.2;
 
-      //add-4
       const box = new THREE.Box3().setFromObject(newModel);
-      const modelWidth = box.max.x - box.min.x;  // Width (X axis)
-      const modelHeight = box.max.y - box.min.y; // Height (Y axis)
-      const modelDepth = box.max.z - box.min.z; 
-      // c
+      const modelWidth = box.max.x - box.min.x;
+      const modelHeight = box.max.y - box.min.y;
+      const modelDepth = box.max.z - box.min.z;
 
       const maxDimension = Math.max(modelWidth, modelHeight, modelDepth);
       let scaleFactor;
-      if(modelScaleFactor<1){
-        scaleFactor=modelScaleFactor;
+      if (modelScaleFactor < 1) {
+        scaleFactor = modelScaleFactor;
+      } else {
+        scaleFactor = modelScaleFactor / (maxDimension);
       }
-      else{
-        scaleFactor = modelScaleFactor/ (maxDimension);
-      }
-      
-
-
 
       newModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
       scene.add(newModel);
-
-      //add-2
       models.push(newModel);
-      selectedModel=newModel;
+      selectedModel = newModel;
       deleteButton.style.display = 'block';
 
-
-      //add-3
-      modelPlaced=true;
-      reticle.visible=false;
-
+      modelPlaced = true;
+      reticle.visible = false;
     }
   }
 
-  //add-2
-  let previousTouch=null;
+  let previousTouch = null;
   function onTouchMove(event) {
-    //add-3
     if (selectedModel && event.touches.length === 1 && previousTouch) {
-      // Rotate the object
       const currentTouch = event.touches[0];
       const deltaX = currentTouch.clientX - previousTouch.clientX;
-      selectedModel.rotation.y += deltaX * 0.005; // Rotation sensitivity
+      selectedModel.rotation.y += deltaX * 0.005;
 
       previousTouch = currentTouch;
     }
-
-    //add-3
-
-    
-
   }
-
-  // //add-3
-  // let touchStartTime = 0;
-  // let touchDurationThreshold = 1000; 
-
 
   function onTouchStart(event) {
     if (selectedModel) {
-
-      // //add-3
-      // if (event.touches.length === 2) {
-      //   // Store initial pinch distance for scaling
-      //   const touch1 = event.touches[0];
-      //   const touch2 = event.touches[1];
-      //   previousTouchDistance = getDistance(touch1, touch2);
-      // }
-
       previousTouch = event.touches[0];
     }
   }
 
   function onTouchEnd(event) {
-    // if (event.touches.length < 2) {
-    //   previousTouchDistance = null; // Reset pinch distance when less than 2 fingers are used
-    // }
     previousTouch = null;
   }
 
-
-  // function getDistance(touch1, touch2) {
-  //   const dx = touch2.clientX - touch1.clientX;
-  //   const dy = touch2.clientY - touch1.clientY;
-  //   return Math.sqrt(dx * dx + dy * dy);
-  // }
-  
   function animate() {
-    //add-3
     if (xrLight.environment) {
       adjustLightingBasedOnEstimation();
     }
@@ -360,32 +262,25 @@ function ARView() {
     if (frame) {
       const referenceSpace = renderer.xr.getReferenceSpace();
       const session = renderer.xr.getSession();
-
-      if (hitTestSourceRequested===false) {
+      if (!hitTestSourceRequested) {
         session.requestReferenceSpace("viewer").then(function (referenceSpace) {
           session.requestHitTestSource({ space: referenceSpace }).then(function (source) {
             hitTestSource = source;
           });
         });
-
         session.addEventListener("end", function () {
           hitTestSourceRequested = false;
           hitTestSource = null;
         });
-
         hitTestSourceRequested = true;
       }
-
       if (hitTestSource) {
         const hitTestResults = frame.getHitTestResults(hitTestSource);
 
         if (hitTestResults.length) {
           const hit = hitTestResults[0];
-
           reticle.visible = true;
-          reticle.matrix.fromArray(
-            hit.getPose(referenceSpace).transform.matrix
-          );
+          reticle.matrix.fromArray(hit.getPose(referenceSpace).transform.matrix);
         } else {
           reticle.visible = false;
         }
