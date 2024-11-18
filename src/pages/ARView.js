@@ -10,7 +10,7 @@ function ARView() {
   const location = useLocation();  // Access the current location object
   const { ms } = location.state || {};
   const modelPath = ms.glb;
-  const modelScaleFactor = 0.01;
+  // const modelScaleFactor = 0.01;
 
   let reticle;
   let hitTestSource = null;
@@ -222,7 +222,18 @@ function ARView() {
       //add-to-know
       newModel.position.y -= 0.15;
 
-      newModel.scale.set(modelScaleFactor, modelScaleFactor, modelScaleFactor);
+      //add-4
+      const box = new THREE.Box3().setFromObject(newModel);
+      const modelWidth = box.max.x - box.min.x;
+      const modelHeight = box.max.y - box.min.y;
+      const modelDepth = box.max.z - box.min.z;
+
+      const maxDimension = Math.max(modelWidth, modelHeight, modelDepth);
+      const scaleFactor = 1 / maxDimension;
+
+
+
+      newModel.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
       scene.add(newModel);
 
@@ -265,18 +276,15 @@ function ARView() {
       //add-3
       const minScale = 0.1;
       const maxScale = 5.0;
-
       if (previousTouchDistance !== null) {
         const scaleChange = currentTouchDistance / previousTouchDistance;
         //add-3
 
         const smoothingFactor = 0.1; // Adjust this value as needed
-        const smoothScale = selectedModel.scale.x * (scaleChange * smoothingFactor);
-        selectedModel.scale.set(
-         Math.min(Math.max(smoothScale, minScale), maxScale),
-          Math.min(Math.max(smoothScale, minScale), maxScale),
-          Math.min(Math.max(smoothScale, minScale), maxScale)
-        );
+
+        let newScale = selectedModel.scale.x * scaleChange * smoothingFactor;
+        newScale = Math.min(Math.max(newScale, minScale), maxScale);
+        selectedModel.scale.set(newScale,newScale,newScale);
       }
 
       previousTouchDistance = currentTouchDistance; // Update previous distance
