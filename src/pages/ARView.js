@@ -163,12 +163,22 @@ function ARView() {
 
     deleteButton = document.createElement('button');
     deleteButton.innerText = 'Delete Model';
+    deleteButton.className = 'delete-button';
     deleteButton.style.position = 'absolute';
     deleteButton.style.bottom = '10%';
     deleteButton.style.left = '50%';
     deleteButton.style.transform = 'translateX(-50%)';
     deleteButton.style.zIndex = '10';
     deleteButton.style.display = 'none';
+
+    
+    deleteButton.style.padding = '10px';
+    deleteButton.style.border = '2px solid white';
+    deleteButton.style.borderRadius = '10px';
+    deleteButton.style.backgroundColor = 'transparent';
+    deleteButton.style.color = 'black';
+    deleteButton.style.fontWeight = 'bold';
+    deleteButton.style.fontSize = '18px';
     deleteButton.addEventListener('click', deleteSelectedModel);
     document.body.appendChild(deleteButton);
   }
@@ -181,6 +191,8 @@ function ARView() {
       models = models.filter(model => model !== selectedModel); // Remove from models array
       selectedModel = null; // Clear selected model
       console.log('Model deleted');
+      deleteButton.style.display = 'none';
+
     }
   }
 
