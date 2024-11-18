@@ -52,21 +52,25 @@ function ARView() {
 
     //add 
     directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(1, 2, 3);
+    directionalLight.position.set(5, 5, 3);
     directionalLight.castShadow = true;
 
     //add0.1
-    directionalLight.shadow.bias = -0.01;
+    directionalLight.shadow.bias = -0.03;
     directionalLight.shadow.mapSize.width = 1024;
     directionalLight.shadow.mapSize.height = 1024;
 
+    directionalLight.intensity = 1.5
+    directionalLight.shadow.opacity = 0.6;
 
     scene.add(directionalLight);
 
 
-    
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.5); 
+    scene.add(ambientLight);
 
-
+    const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 5);
+scene.add(directionalLightHelper);
 
     renderer = new THREE.WebGLRenderer({
       canvas: myCanvas,
@@ -220,7 +224,7 @@ function ARView() {
       );
 
       //add-to-know
-      newModel.position.y -= 0.15;
+      newModel.position.y -= 0.35;
 
       //add-4
       const box = new THREE.Box3().setFromObject(newModel);
