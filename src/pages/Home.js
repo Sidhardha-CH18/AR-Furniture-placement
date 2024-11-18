@@ -15,7 +15,7 @@ function Home() {
     { name: "armchairv", image: "/images/armchairv.png", glb: "/models/armchairv.glb", target: 0.01 },
     { name: "fliptable", image: "/images/fliptable.png", glb: "/models/filptable.glb", target: 0.01 },
     { name: "armchairk", image: "/images/armchairk.png", glb: "/models/armchairk.glb", target:4 },
-    { name: "armchairp", image: "/images/armchairp.png", glb: "/models/armchairp.glb", target:1.8 },
+    { name: "armchairp", image: "/images/armchairp.png", glb: "/models/armchairp.glb", target:1.6 },
     { name: "carpet", image: "/images/carpet.png", glb: "/models/carpet.glb", target: 3 },
     { name: "coffee set", image: "/images/coffeeset.png", glb: "/models/coffeeset.glb", target: 1.2},
     { name: "dinning table", image: "/images/dintable.png", glb: "/models/dintable.glb", target: 3 },
