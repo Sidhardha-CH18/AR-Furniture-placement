@@ -30,6 +30,10 @@ function ARView() {
   let light, directionalLight;
   let xrLight;
 
+  let touchStartTime = 0;
+  let longPressDuration = 1000; // 1 second duration for long press
+  // let longPressTimer = null; 
+
 
 
   init();
@@ -285,32 +289,48 @@ function ARView() {
 
   function onTouchStart(event) {
     if (selectedModel) {
+      const intersection = getIntersection(event.touches[0]);
+      if (intersection && intersection.object === selectedModel) {
+        touchStartTime = Date.now(); // Start the timer
+        
+        
+        // Optionally, visually indicate the touch (like highlighting)
+        selectedModel.material.emissive.set(0x00ff00); // Change to green on touch
+      }
 
-      // //add-3
-      // if (event.touches.length === 2) {
-      //   // Store initial pinch distance for scaling
-      //   const touch1 = event.touches[0];
-      //   const touch2 = event.touches[1];
-      //   previousTouchDistance = getDistance(touch1, touch2);
-      // }
+
 
       previousTouch = event.touches[0];
     }
   }
 
   function onTouchEnd(event) {
-    // if (event.touches.length < 2) {
-    //   previousTouchDistance = null; // Reset pinch distance when less than 2 fingers are used
-    // }
-    previousTouch = null;
+    if (selectedModel && previousTouch) {
+      const touchEndTime = Date.now();
+      const touchDuration = touchEndTime - touchStartTime;
+  
+      // If the touch duration exceeds the long press threshold, delete the model
+      if (touchDuration >= longPressDuration) {
+        deleteModel(selectedModel);
+      }
+  
+      // Reset the touch tracking
+      previousTouch = null;
+      selectedModel.material.emissive.set(0x000000); // Reset the emissive color (remove the green)
+    }
   }
 
 
-  // function getDistance(touch1, touch2) {
-  //   const dx = touch2.clientX - touch1.clientX;
-  //   const dy = touch2.clientY - touch1.clientY;
-  //   return Math.sqrt(dx * dx + dy * dy);
-  // }
+  function deleteModel(modelToDelete) {
+    scene.remove(modelToDelete);
+    const index = models.indexOf(modelToDelete);
+    if (index !== -1) {
+      models.splice(index, 1); // Remove from the models array
+    }
+    selectedModel = null; // Deselect the model
+    modelPlaced = false;  // Allow placing a new model
+    console.log("Model deleted:", modelToDelete);
+  }
   
   function animate() {
     //add-3
