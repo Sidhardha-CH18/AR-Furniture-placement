@@ -30,9 +30,7 @@ function ARView() {
   let light, directionalLight;
   let xrLight;
 
-  let touchStartTime = 0;
-  let longPressDuration = 1000; // 1 second duration for long press
-  // let longPressTimer = null; 
+  let deleteButton;
 
 
 
@@ -162,11 +160,29 @@ function ARView() {
     window.addEventListener('touchmove', (event) => onTouchMove(event));
     window.addEventListener('touchend', (event) => onTouchEnd(event));
 
+
+    deleteButton = document.createElement('button');
+    deleteButton.innerText = 'Delete Model';
+    deleteButton.style.position = 'absolute';
+    deleteButton.style.bottom = '10%';
+    deleteButton.style.left = '50%';
+    deleteButton.style.transform = 'translateX(-50%)';
+    deleteButton.style.zIndex = '10';
+    deleteButton.style.display = 'none';
+    deleteButton.addEventListener('click', deleteSelectedModel);
+    document.body.appendChild(deleteButton);
   }
   
 
 
-
+  function deleteSelectedModel() {
+    if (selectedModel) {
+      scene.remove(selectedModel);
+      models = models.filter(model => model !== selectedModel); // Remove from models array
+      selectedModel = null; // Clear selected model
+      console.log('Model deleted');
+    }
+  }
 
   //add-3
 
@@ -196,7 +212,9 @@ function ARView() {
     else{
       if (intersection) {
         selectedModel = intersection.object;
-        selectedModel.material.emissive.set(0xff0000); // Highlight selected model
+        selectedModel.material.emissive.set(0xff0000);
+        deleteButton.style.display = 'block';
+         // Highlight selected model
         console.log('Selected model:', selectedModel);
       } 
     }
@@ -254,6 +272,7 @@ function ARView() {
       //add-2
       models.push(newModel);
       selectedModel=newModel;
+      deleteButton.style.display = 'block';
 
 
       //add-3
@@ -289,48 +308,32 @@ function ARView() {
 
   function onTouchStart(event) {
     if (selectedModel) {
-      const intersection = getIntersection(event.touches[0]);
-      if (intersection && intersection.object === selectedModel) {
-        touchStartTime = Date.now(); // Start the timer
-        
-        
-        // Optionally, visually indicate the touch (like highlighting)
-        selectedModel.material.emissive.set(0x00ff00); // Change to green on touch
-      }
 
-
+      // //add-3
+      // if (event.touches.length === 2) {
+      //   // Store initial pinch distance for scaling
+      //   const touch1 = event.touches[0];
+      //   const touch2 = event.touches[1];
+      //   previousTouchDistance = getDistance(touch1, touch2);
+      // }
 
       previousTouch = event.touches[0];
     }
   }
 
   function onTouchEnd(event) {
-    if (selectedModel && previousTouch) {
-      const touchEndTime = Date.now();
-      const touchDuration = touchEndTime - touchStartTime;
-  
-      // If the touch duration exceeds the long press threshold, delete the model
-      if (touchDuration >= longPressDuration) {
-        deleteModel(selectedModel);
-      }
-  
-      // Reset the touch tracking
-      previousTouch = null;
-      selectedModel.material.emissive.set(0x000000); // Reset the emissive color (remove the green)
-    }
+    // if (event.touches.length < 2) {
+    //   previousTouchDistance = null; // Reset pinch distance when less than 2 fingers are used
+    // }
+    previousTouch = null;
   }
 
 
-  function deleteModel(modelToDelete) {
-    scene.remove(modelToDelete);
-    const index = models.indexOf(modelToDelete);
-    if (index !== -1) {
-      models.splice(index, 1); // Remove from the models array
-    }
-    selectedModel = null; // Deselect the model
-    modelPlaced = false;  // Allow placing a new model
-    console.log("Model deleted:", modelToDelete);
-  }
+  // function getDistance(touch1, touch2) {
+  //   const dx = touch2.clientX - touch1.clientX;
+  //   const dy = touch2.clientY - touch1.clientY;
+  //   return Math.sqrt(dx * dx + dy * dy);
+  // }
   
   function animate() {
     //add-3
