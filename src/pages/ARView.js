@@ -229,7 +229,7 @@ function ARView() {
       const modelDepth = 0.964
 
       const maxDimension = Math.max(modelWidth, modelHeight, modelDepth);
-      const scaleFactor = 1 / maxDimension;
+      const scaleFactor = 1 / (maxDimension*10);
 
 
 
