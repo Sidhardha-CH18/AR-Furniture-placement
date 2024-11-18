@@ -283,9 +283,9 @@ function ARView() {
 
   }
 
-  //add-3
-  let touchStartTime = 0;
-  let touchDurationThreshold = 1000; 
+  // //add-3
+  // let touchStartTime = 0;
+  // let touchDurationThreshold = 1000; 
 
 
   function onTouchStart(event) {
