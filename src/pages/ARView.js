@@ -64,9 +64,8 @@ function ARView() {
     scene.add(directionalLight);
 
 
-    //add-3
+    
 
-    xrLight=new XREstimatedLight(renderer);
 
 
     renderer = new THREE.WebGLRenderer({
@@ -82,6 +81,8 @@ function ARView() {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
+    //add-3
+    xrLight=new XREstimatedLight(renderer);
 
 
     xrLight.addEventListener("estimationstart", () => {
