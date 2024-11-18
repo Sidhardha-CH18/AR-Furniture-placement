@@ -223,10 +223,10 @@ function ARView() {
       newModel.position.y -= 0.15;
 
       //add-4
-      const box = new THREE.Box3().setFromObject(newModel);
-      const modelWidth = box.max.x - box.min.x;
-      const modelHeight = box.max.y - box.min.y;
-      const modelDepth = box.max.z - box.min.z;
+      // const box = new THREE.Box3().setFromObject(newModel);
+      const modelWidth = 0.876
+      const modelHeight = 0.76;
+      const modelDepth = 0.964
 
       const maxDimension = Math.max(modelWidth, modelHeight, modelDepth);
       const scaleFactor = 1 / maxDimension;
