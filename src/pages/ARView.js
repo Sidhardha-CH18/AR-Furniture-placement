@@ -22,6 +22,16 @@ function ARView() {
   let controller;
 
   let selectedModel=null; //add-2
+
+  let modelPlaced = false; //add-3
+
+  //add-3
+
+  let light, directionalLight;
+  let xrLight;
+
+
+
   init();
   animate();
 
@@ -35,13 +45,13 @@ function ARView() {
       20
     );
 
-    const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+    light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
     light.position.set(0.5, 1, 0.25);
     scene.add(light);
 
 
     //add 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight = new THREE.DirectionalLight(0xffffff, 1);
     directionalLight.position.set(1, 2, 3);
     directionalLight.castShadow = true;
 
@@ -52,6 +62,11 @@ function ARView() {
 
 
     scene.add(directionalLight);
+
+
+    //add-3
+
+    xrLight=new XREstimatedLight(renderer);
 
 
     renderer = new THREE.WebGLRenderer({
@@ -69,19 +84,21 @@ function ARView() {
 
 
 
-    const xrLight = new XREstimatedLight(renderer);
     xrLight.addEventListener("estimationstart", () => {
       scene.add(xrLight);
       scene.remove(light);
       if (xrLight.environment) {
         scene.environment = xrLight.environment;
+
+        //add-3
+        adjustLightingBasedOnEstimation();
       }
     });
 
     xrLight.addEventListener("estimationend", () => {
       scene.add(light);
       scene.remove(xrLight);
-      // scene.environment = null; // Reset environment
+      scene.environment = null;
     });
 
     let arButton = ARButton.createButton(renderer, {
@@ -141,19 +158,40 @@ function ARView() {
   }
   
 
+
+
+
+  //add-3
+
+  function adjustLightingBasedOnEstimation() {
+    if(xrLight.environment){
+      const estimatedIntensity=xrLight.environment.intensity || 1.0;
+      directionalLight.intensity = estimatedIntensity;
+
+      const estimatedDirection = xrLight.environment.direction;
+      directionalLight.position.set(estimatedDirection.x, estimatedDirection.y, estimatedDirection.z);
+      
+      const estimatedColorTemperature = xrLight.environment.colorTemperature || 6500; // Default: 6500K (white light)
+     directionalLight.color.setHSL(estimatedColorTemperature / 10000, 0.5, 0.5); // Adjust color temperature
+    }
+  }
+
+
   //add-2
 
   function onSelectStart(event){
-    if (selectedModel) {
+    const intersection = getIntersection(event.data.controller);
+    if (selectedModel) {// && selectedModel===intersection.object
       // Deselect the current model if any
       selectedModel.material.emissive.set(0x000000); // Reset highlight (e.g., remove color change)
       selectedModel = null;
     }
-    const intersection = getIntersection(event.data.controller);
-    if (intersection) {
-      selectedModel = intersection.object;
-      selectedModel.material.emissive.set(0xff0000); // Highlight selected model
-      console.log('Selected model:', selectedModel);
+    else{
+      if (intersection) {
+        selectedModel = intersection.object;
+        selectedModel.material.emissive.set(0xff0000); // Highlight selected model
+        console.log('Selected model:', selectedModel);
+      } 
     }
   }
 
@@ -169,7 +207,7 @@ function ARView() {
 
   function onSelect() {
 
-    if (reticle.visible ) {
+    if (reticle.visible && !modelPlaced ) {
       const newModel = model.clone();
       newModel.visible = true;
 
@@ -180,8 +218,8 @@ function ARView() {
         newModel.scale
       );
 
-      //add
-      // newModel.position.y -= 0.1;
+      //add-to-know
+      newModel.position.y -= 0.15;
 
       newModel.scale.set(modelScaleFactor, modelScaleFactor, modelScaleFactor);
 
@@ -191,37 +229,102 @@ function ARView() {
       models.push(newModel);
       selectedModel=newModel;
 
+
+      //add-3
+      modelPlaced=true;
+      reticle.visible=false;
+
     }
   }
 
   //add-2
   let previousTouch=null;
+  let previousTouchDistance=null;
   function onTouchMove(event) {
-    if (selectedModel && previousTouch) {
+    //add-3
+    if (selectedModel && event.touches.length === 1 && previousTouch) {
+      // Rotate the object
       const currentTouch = event.touches[0];
       const deltaX = currentTouch.clientX - previousTouch.clientX;
-      const deltaY = currentTouch.clientY - previousTouch.clientY;
-
-      selectedModel.rotation.y += deltaX * 0.01;
-      selectedModel.rotation.x += deltaY * 0.01;
+      selectedModel.rotation.y += deltaX * 0.005; // Rotation sensitivity
 
       previousTouch = currentTouch;
     }
+
+    //add-3
+
+    if (selectedModel && event.touches.length === 2) {
+      // Scaling: Calculate the change in pinch distance
+      const touch1 = event.touches[0];
+      const touch2 = event.touches[1];
+      const currentTouchDistance = getDistance(touch1, touch2);
+
+
+
+      //add-3
+      const minScale = 0.1;
+      const maxScale = 5.0;
+
+      if (previousTouchDistance !== null) {
+        const scaleChange = currentTouchDistance / previousTouchDistance;
+        //add-3
+
+        const smoothingFactor = 0.1; // Adjust this value as needed
+        const smoothScale = selectedModel.scale.x * (scaleChange * smoothingFactor);
+        selectedModel.scale.set(
+         Math.min(Math.max(smoothScale, minScale), maxScale),
+          Math.min(Math.max(smoothScale, minScale), maxScale),
+          Math.min(Math.max(smoothScale, minScale), maxScale)
+        );
+      }
+
+      previousTouchDistance = currentTouchDistance; // Update previous distance
+    }
+
   }
+
+  //add-3
+  let touchStartTime = 0;
+  let touchDurationThreshold = 1000; 
+
+
   function onTouchStart(event) {
     if (selectedModel) {
+
+      //add-3
+      if (event.touches.length === 2) {
+        // Store initial pinch distance for scaling
+        const touch1 = event.touches[0];
+        const touch2 = event.touches[1];
+        previousTouchDistance = getDistance(touch1, touch2);
+      }
+
       previousTouch = event.touches[0];
     }
   }
 
   function onTouchEnd(event) {
+    if (event.touches.length < 2) {
+      previousTouchDistance = null; // Reset pinch distance when less than 2 fingers are used
+    }
     previousTouch = null;
   }
 
 
-
+  function getDistance(touch1, touch2) {
+    const dx = touch2.clientX - touch1.clientX;
+    const dy = touch2.clientY - touch1.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
   
   function animate() {
+    //add-3
+    if (xrLight.environment) {
+      adjustLightingBasedOnEstimation();
+    }
+    renderer.render(scene, camera);
+
+
     renderer.setAnimationLoop(render);
   }
 
