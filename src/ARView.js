@@ -43,6 +43,7 @@ function App() {
       optionalFeatures: ["dom-overlay", "light-estimation"],domOverlay: { root: document.body },
     });
     arButton.style.bottom = "20%";
+    arButton.style.backgroundColor="blue"
     document.body.appendChild(arButton);
     const loader = new GLTFLoader();
     loader.load(modelPath, function (glb) {
