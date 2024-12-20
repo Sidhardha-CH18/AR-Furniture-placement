@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import BottomScreen from "../components/BottomScreen";
+import Header from "../components/Header";
 
 function Home() {
   const [isBottomScreenVisible, setBottomScreenVisible] = useState(false);
