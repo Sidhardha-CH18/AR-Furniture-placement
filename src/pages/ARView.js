@@ -156,6 +156,7 @@ function ARView() {
       scene.remove(selectedModel);
       models = models.filter(model => model !== selectedModel);
       selectedModel = null;
+      modelPlaced=false;
       deleteButton.style.display = 'none';
     }
   }
@@ -222,7 +223,7 @@ function ARView() {
 
       scene.add(newModel);
       models.push(newModel);
-      selectedModel = newModel;
+      selectedModel = null;
       deleteButton.style.display = 'block';
 
       modelPlaced = true;
@@ -236,7 +237,6 @@ function ARView() {
       const currentTouch = event.touches[0];
       const deltaX = currentTouch.clientX - previousTouch.clientX;
       selectedModel.rotation.y += deltaX * 0.005;
-
       previousTouch = currentTouch;
     }
   }
